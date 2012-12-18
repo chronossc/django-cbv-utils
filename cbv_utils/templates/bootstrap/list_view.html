@@ -1,0 +1,12 @@
+{% extends base_template %}
+{% load i18n %}
+{% block content %}
+  <h2>{{ verbose_name_plural }}</h2>
+  <p>{{ long_desc }}</p>
+  <div id="objectList">
+    {% include object_list_template %}{# use a separated object_list render so you can do ajax searches #}
+  </div>
+  <p><a href="{% url add_item_url %}"
+       class="btn btn-success"><i class="icon-plus icon-white"></i>
+       {% trans "Add" %}</a></p>
+{% endblock %}

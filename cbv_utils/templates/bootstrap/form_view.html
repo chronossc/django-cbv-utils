@@ -1,0 +1,41 @@
+{% extends base_template %}
+{% load bootstrap_toolkit %}
+{% block content %}
+<div class="span12">
+  <h2>{{ verbose_name_plural }} {{ form.instance.email }}</h2>
+  <p>{{ long_desc }}</p>
+  <form action="." method="POST" accept-charset="utf-8" class="form-horizontal">
+    {% csrf_token %}
+    <div class="row-fluid">
+      <div class="span8">
+        {% block form %}
+        {% if form.fieldsets %}
+          {% if form.non_field_errors %}{{ form.non_field_errors }}{% endif %}
+          {% for fieldset in form.fieldsets %}
+            <fieldset class="{{ fieldset.classes }}">
+              {% if fieldset.legend %}
+              <legend>{{ fieldset.legend }}</legend>
+              {% endif %}
+              {% if fieldset.description %}
+              <p class="description">{{ fieldset.description }}</p>
+              {% endif %}
+              {% for field in fieldset %}
+                {{ field|as_bootstrap:"horizontal" }}
+              {% endfor %}
+            </fieldset>
+          {% endfor %}
+        {% else %}
+        {{ form|as_bootstrap }}
+        {% endif %}
+        {% endblock form %}
+      </div>
+      <div class="offset8 affix">
+          {% block form-actions %}
+          <button class="btn btn-primary" type="submit">Enviar</button>
+          <a class="btn btn-danger" href="{% url object_list_url %}">Cancelar</a>
+          {% endblock form-actions %}
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock content %}
