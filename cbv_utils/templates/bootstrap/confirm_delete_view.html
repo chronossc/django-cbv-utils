@@ -1,0 +1,12 @@
+{% extends base_template %}
+{% block content %}
+<h2>Tem certeza?</h2>
+<p>Você tem certeza que deseja excluir o(a) {{ verbose_name }} <strong>{{ object }}</strong>?</p>
+<p>A exclusão do(a) {{ verbose_name }} é irreversível.<br/>Todos os objetos relacionados serão excluídos.<br/>Se deseja de fato excluir, clique em "<b>Excluir</b>"</p>
+<form action="" method="POST" accept-charset="utf-8">
+    {% csrf_token %}
+    <input type="hidden" name="__confirm__" value="1" />
+    <button type="submit" class="btn btn-danger">Excluir</button>
+    <a href="{% url object_list_url %}" class="btn btn-primary">Voltar</a>
+</form>
+{% endblock content %}

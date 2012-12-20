@@ -3,8 +3,15 @@
 {% block content %}
   <h2>{{ verbose_name_plural }}</h2>
   <p>{{ long_desc }}</p>
+  <p><a href="{% url add_item_url %}"
+       class="btn btn-success"><i class="icon-plus icon-white"></i>
+       {% trans "Add" %}</a></p>
   <div id="objectList">
+    {% if object_list.count > 0 %}
     {% include object_list_template %}{# use a separated object_list render so you can do ajax searches #}
+    {% else %}
+    <p class="alert">Nenhum(a) {{ verbose_name|default:"item"|lower }} cadastrado(a) ainda.</p>
+    {% endif %}
   </div>
   <p><a href="{% url add_item_url %}"
        class="btn btn-success"><i class="icon-plus icon-white"></i>

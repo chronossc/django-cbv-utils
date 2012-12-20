@@ -29,12 +29,17 @@
         {% endif %}
         {% endblock form %}
       </div>
-      <div class="offset8 affix">
           {% block form-actions %}
-          <button class="btn btn-primary" type="submit">Enviar</button>
-          <a class="btn btn-danger" href="{% url object_list_url %}">Cancelar</a>
+          <div class="offset8 btn-group affix">
+              {% if is_create %}
+              <button class="btn btn-primary" type="submit" title="Criar"><i class="icon-save"></i></button>
+              {% else %}
+              <button class="btn btn-primary" type="submit" title="Salvar"><i class="icon-save"></i></button>
+              <a class="btn btn-warning" href="{% url delete_url pk=object.pk %}" title="Excluir"><i class="icon-trash"></i></a>
+              {% endif %}
+              <a class="btn btn-danger" href="{% url object_list_url %}" title="Cancelar"><i class="icon-signout"></i></a>
+          </div>
           {% endblock form-actions %}
-      </div>
     </div>
   </form>
 </div>
