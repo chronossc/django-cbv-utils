@@ -1,0 +1,25 @@
+from setuptools import setup, find_packages
+setup(
+    name="django-cvb-utils",
+    version="0.0.1",
+    packages=find_packages(),
+    author="Felipe 'chronos' Prenholato",
+    author_email="philipe.rp@gmail.com",
+    maintainer="Felipe 'chronos' Prenholato",
+    maintainer_email="philipe.rp@gmail.com",
+    url="http://github.com/chronossc/django-cbv-utils",
+    license='NEW BSD LICENSE: http://www.opensource.org/licenses/bsd-license.php',
+    description="A bunch of utils used with Django class based views.",
+    long_description="",
+    classifiers=[
+        "Development Status :: 4 - Beta",
+        #"Development Status :: 5 - Production/Stable",
+        "Environment :: Web Environment",
+        "Framework :: Django",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: BSD License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python",
+    ],
+    install_requires=["Django>=1.4.3"],
+)
