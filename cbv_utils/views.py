@@ -79,17 +79,23 @@ class SuccessMsgMixing(object):
 
 class ListView(CBVUtilsMixin, generic.ListView):
 
+    long_desc = ''
+
     def get_context_data(self, **kw):
         context = super(ListView, self).get_context_data(**kw)
         context['is_list'] = True
+        context['long_desc'] = self.long_desc
         return context
 
 
 class CreateView(SuccessMsgMixing, CBVUtilsMixin, generic.CreateView):
 
+    long_desc = ''
+
     def get_context_data(self, **kw):
         context = super(CreateView, self).get_context_data(**kw)
         context['is_create'] = True
+        context['long_desc'] = self.long_desc
         return context
 
     def send_success_msg(self):
@@ -100,9 +106,12 @@ class CreateView(SuccessMsgMixing, CBVUtilsMixin, generic.CreateView):
 
 class UpdateView(SuccessMsgMixing, CBVUtilsMixin, generic.UpdateView):
 
+    long_desc = ''
+
     def get_context_data(self, **kw):
         context = super(UpdateView, self).get_context_data(**kw)
         context['is_update'] = True
+        context['long_desc'] = self.long_desc
         return context
 
     def send_success_msg(self):
@@ -112,6 +121,8 @@ class UpdateView(SuccessMsgMixing, CBVUtilsMixin, generic.UpdateView):
 
 
 class DeleteView(CBVUtilsMixin, generic.DeleteView):
+
+    long_desc = ''
 
     def delete(self, request, *a, **kw):
         r = super(DeleteView, self).delete(request, *a, **kw)
@@ -130,4 +141,5 @@ class DeleteView(CBVUtilsMixin, generic.DeleteView):
     def get_context_data(self, **kw):
         context = super(DeleteView, self).get_context_data(**kw)
         context['is_delete'] = True
+        context['long_desc'] = self.long_desc
         return context
