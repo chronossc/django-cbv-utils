@@ -4,7 +4,6 @@ from __future__ import (absolute_import, division, unicode_literals)
 
 from django import template
 from django.core.urlresolvers import reverse
-from django.template import TemplateSyntaxError, TemplateDoesNotExist
 from django.utils.encoding import smart_unicode
 from django.utils.safestring import mark_safe
 
@@ -30,9 +29,11 @@ def do_entry(context, url, title, _template="cbv_utils/menu_entry.html", args=No
         url = reverse(url, args=smart_unicode(args).translate(None, "'\"[]").split(","))
     elif kw:
         url = reverse(url, kwargs=kw)
+    else:
+        url = reverse(url)
 
     return template.loader.render_to_string(_template, {
         'url': url,
         'title': title,
-        'active': context['request']
+        'active': context['request'].path == url
         })
