@@ -6,6 +6,11 @@ from django.views import generic
 from django.core.urlresolvers import resolve
 from django.conf import settings
 from django.contrib import messages
+from django.http import HttpResponseForbidden
+from django.template import RequestContext
+from django.template.loader import render_to_string
+from cbv_utils.http.response import JSONResponse
+
 
 class CBVUtilsMixin(object):
 
@@ -35,7 +40,7 @@ class CBVUtilsMixin(object):
         context = super(CBVUtilsMixin, self).get_context_data(**kw)
         self.url_info = resolve(self.request.path)
         if self.url_info.namespace:
-            namespace_str = self.url_info.namespace+':'
+            namespace_str = self.url_info.namespace + ':'
         else:
             namespace_str = ''
 
@@ -51,13 +56,12 @@ class CBVUtilsMixin(object):
         if self.template_name_suffix == '_list':
             context.update({
             'object_list_template': self.model_opts.app_label + '/' + self.model_opts.module_name + self.template_name_suffix + '_page.html',
-            'add_item_url': namespace_str + url_model_name +'_new',
+            'add_item_url': namespace_str + url_model_name + '_new',
             })
         else:
             context.update({
                 'object_list_url': namespace_str + url_model_name + '_list',
             })
-
 
         if self.template_name_suffix == '_form':
             context.update({
@@ -143,3 +147,37 @@ class DeleteView(CBVUtilsMixin, generic.DeleteView):
         context['is_delete'] = True
         context['long_desc'] = self.long_desc
         return context
+
+
+class AjaxUpdateView(generic.UpdateView):
+
+    http_method_names = ['post', 'put']
+    template_name_suffix = '_ajax_form'
+
+    def form_valid(self, form):
+        self.object = form.save()
+        return JSONResponse({'status': 'success', 'msg': self.send_success_msg(),
+            'form': self.render_form(form, success=self.send_success_msg())})
+
+    def form_invalid(self, form):
+        return JSONResponse({'status': 'error', 'errors': form.errors,
+            'form': self.render_form(form)})
+
+    def post(self, request, *a, **kw):
+        if request.is_ajax():
+            self.object = self.get_object()
+            form = self.get_form(self.get_form_class())
+            if form.is_valid():
+                return self.form_valid(form)
+            else:
+                return self.form_invalid(form)
+        else:
+            return HttpResponseForbidden("403: Access denied. This url should be acessed via Ajax requests.")
+
+    def render_form(self, form, **context):
+        return render_to_string(self.get_template_names(),
+            self.get_context_data(form=form, **context), RequestContext(self.request))
+
+    def send_success_msg(self):
+        # Please, customize this method in your view
+        return "It's saved"
