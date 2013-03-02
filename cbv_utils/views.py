@@ -2,14 +2,16 @@
 
 from __future__ import (absolute_import, division, unicode_literals)
 
-from django.views import generic
 from django.core.urlresolvers import resolve
 from django.conf import settings
 from django.contrib import messages
+from django.db.models import Q
 from django.http import HttpResponseForbidden
 from django.template import RequestContext
 from django.template.loader import render_to_string
+from django.views import generic
 from cbv_utils.http.response import JSONResponse
+from operator import or_
 
 
 class CBVUtilsMixin(object):
@@ -181,3 +183,52 @@ class AjaxUpdateView(generic.UpdateView):
     def send_success_msg(self):
         # Please, customize this method in your view
         return "It's saved"
+
+
+class AjaxSearchView(generic.ListView):
+    """ Allow ajax searches and return rendered template to be used with jquery """
+
+    lookup_keys = []
+    order_by = []
+    limit = 30
+    template_name_suffix = '_ajax_search'
+
+    def post(self, request, *a, **kw):
+        return self.get(request, *a, **kw)
+
+    def get_ordering(self):
+        if not self.order_by:
+            self.order_by = self.model._meta.ordering or []
+        return self.order_by
+
+    def filter(self, queryset=None):
+
+        term = self.request.REQUEST.get('term')
+
+        if not term:
+            return self.model.objects.get_empty_query_set()
+
+        if queryset is None:
+            queryset = self.get_queryset()
+
+        if not self.lookup_keys:
+            raise ValueError("Please, %s need lookup_keys to be set." % self.__name__)
+
+        search_args = reduce(or_, map(lambda lookup: Q(**{lookup: term}),
+                                      self.get_lookup_keys()))
+
+        return queryset.filter(search_args)
+
+    def get_queryset(self):
+        return self.filter(
+            super(AjaxSearchView, self).get_queryset())
+
+    def get_lookup_keys(self):
+        """ you can customize based on request if want """
+        return self.lookup_keys
+
+    def get_context_data(self, **kw):
+        context = super(AjaxSearchView, self).get_context_data(**kw)
+        context['object_list'] = context['object_list'][:self.limit]
+        context['search_term'] = self.request.REQUEST.get('term')
+        return context
