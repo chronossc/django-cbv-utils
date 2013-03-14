@@ -2,7 +2,14 @@
 {% block content %}
 <h2>Tem certeza?</h2>
 <p>Você tem certeza que deseja excluir o(a) {{ verbose_name }} <strong>{{ object }}</strong>?</p>
-<p>A exclusão do(a) {{ verbose_name }} é irreversível.<br/>Todos os objetos relacionados serão excluídos.<br/>Se deseja de fato excluir, clique em "<b>Excluir</b>"</p>
+{# <p>A exclusão do(a) {{ verbose_name }} é irreversível.<br/>Todos os objetos relacionados serão excluídos.<br/>Se deseja de fato excluir, clique em "<b>Excluir</b>"</p> #}
+{# <p>Excluíndo o(a) {{ verbose_name }} {{ object }} você estará excluindo também:</p> #}
+{# {% if affected_objects.1 }} #}
+<div class="row-fluid">
+     <div class="span6">
+         {{ affected_objects.1|unordered_list }}
+     </div>
+ </div>
 <form action="" method="POST" accept-charset="utf-8">
     {% csrf_token %}
     <input type="hidden" name="__confirm__" value="1" />

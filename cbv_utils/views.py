@@ -10,7 +10,10 @@ from django.http import HttpResponseForbidden
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.views import generic
+from django.utils.encoding import force_text
+from django.utils.text import capfirst
 from cbv_utils.http.response import JSONResponse
+from cbv_utils.utils import NestedObjects
 from operator import or_
 
 
@@ -148,6 +151,32 @@ class DeleteView(CBVUtilsMixin, generic.DeleteView):
         context = super(DeleteView, self).get_context_data(**kw)
         context['is_delete'] = True
         context['long_desc'] = self.long_desc
+        collector = NestedObjects(using=self.object._state.db)
+        collector.collect([self.object])
+
+        def format_callback(obj, origin=self.object):
+            opts = obj._meta
+            if opts.auto_created:
+                related_fields = [f for f in opts.local_fields
+                    if f is not opts.auto_field
+                        and f.name != opts.auto_created._meta.module_name]
+                if related_fields:
+                    _from = getattr(obj, opts.auto_created._meta.module_name)
+                    to = getattr(obj, related_fields[0].name)
+                    if _from == origin:
+                        return "Relacionamento %s > %s para %s será removido automaticamente" % (
+                            capfirst(_from._meta.verbose_name),
+                            capfirst(to._meta.verbose_name),
+                            force_text(to))
+                    else:
+                        return "Você precisa remover o %s da %s: %s" % (
+                            to._meta.verbose_name,
+                            capfirst(_from._meta.verbose_name),
+                            force_text(_from))
+            return '%s: %s' % (capfirst(opts.verbose_name), force_text(obj))
+        context['affected_objects'] = collector.nested(format_callback)
+        from pprint import pprint
+        pprint(context['affected_objects'])
         return context
 
 
